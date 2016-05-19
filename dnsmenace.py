@@ -50,7 +50,7 @@ def get_resolv():
 
 def get_country():
     name = raw_input("What country: ")
-    print countries.get(name)[:number]
+    print countries.get(name)[:2]
 
 def get_all():
     for c in countries:
