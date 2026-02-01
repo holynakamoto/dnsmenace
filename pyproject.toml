@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dnsmenace"
-version = "2.0.0"
-description = "Query DNS servers from any country in the world"
+version = "2.1.0"
+description = "Global DNS query tool for security researchers"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
     { name = "holynakamoto" }
 ]
-keywords = ["dns", "networking", "security", "cli", "nameserver"]
+keywords = ["dns", "networking", "security", "cli", "nameserver", "pentesting", "recon", "osint"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
