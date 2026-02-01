@@ -340,13 +340,12 @@ def query(
 
     # Display results
     console.print()
-    match output:
-        case OutputFormat.TABLE:
-            display_results_table(results)
-        case OutputFormat.JSON:
-            display_results_json(results)
-        case OutputFormat.CSV:
-            display_results_csv(results)
+    if output == OutputFormat.TABLE:
+        display_results_table(results)
+    elif output == OutputFormat.JSON:
+        display_results_json(results)
+    elif output == OutputFormat.CSV:
+        display_results_csv(results)
 
     # Summary
     successful = sum(1 for r in results if not r.error)
