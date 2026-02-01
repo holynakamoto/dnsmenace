@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dnsmenace"
+version = "2.0.0"
+description = "Query DNS servers from any country in the world"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "holynakamoto" }
+]
+keywords = ["dns", "networking", "security", "cli", "nameserver"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: Name Service (DNS)",
+    "Topic :: System :: Networking",
+    "Typing :: Typed",
+]
+dependencies = [
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "dnspython>=2.4.0",
+    "httpx>=0.25.0",
+    "iso3166>=2.1.0",
+    "pydantic>=2.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+]
+
+[project.scripts]
+dnsmenace = "dnsmenace:app"
+
+[project.urls]
+Homepage = "https://github.com/holynakamoto/dnsmenace"
+Repository = "https://github.com/holynakamoto/dnsmenace"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
