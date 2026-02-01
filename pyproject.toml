@@ -66,4 +66,4 @@ warn_return_any = true
 warn_unused_configs = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+py-modules = ["dnsmenace"]

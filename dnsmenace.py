@@ -318,7 +318,7 @@ def query(
         console.print(f"\n[bold]Querying DNS servers from:[/bold] {country_info.name} ({country.upper()})")
     except KeyError:
         console.print(f"[red]Invalid country code: {country}[/red]")
-        console.print("Use 'dnsmenace countries' to see available codes.")
+        console.print("Use 'dnsmenace countries-list' to see available codes.")
         raise typer.Exit(1)
 
     console.print(f"[bold]Domain:[/bold] {domain}")
