@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dnsmenace"
-version = "2.1.0"
+version = "3.0.0"
 description = "Global DNS query tool for security researchers"
 readme = "README.md"
 license = "MIT"
