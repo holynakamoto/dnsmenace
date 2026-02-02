@@ -555,7 +555,7 @@ def security(
     ],
 ) -> None:
     """
-    Check email security records (SPF, DKIM, DMARC) and DNSSEC.
+    Check email security records (SPF, DKIM, DMARC, CAA).
 
     Analyzes the domain's DNS security configuration.
 
@@ -948,7 +948,7 @@ def axfr(
 
             console.print(table)
             if record_count >= 50:
-                console.print(f"[dim]... and more records (showing first 50)[/dim]")
+                console.print("[dim]... and more records (showing first 50)[/dim]")
     else:
         console.print(Panel(
             "[green]All nameservers properly deny zone transfers.[/green]\n"
