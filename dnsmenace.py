@@ -13,7 +13,6 @@ import base64
 import csv
 import json
 import socket
-import struct
 import sys
 import time
 from dataclasses import dataclass, field
@@ -147,7 +146,7 @@ SUBDOMAIN_WORDLIST = [
     "exchange", "mx", "mx1", "mx2", "newsletter",
     # Infrastructure
     "ns", "ns1", "ns2", "ns3", "dns", "dns1", "dns2", "vpn", "vpn2",
-    "proxy", "gateway", "firewall", "router", "lb", "loadbalancer",
+    "proxy", "firewall", "router", "lb", "loadbalancer",
     # Storage & Data
     "ftp", "sftp", "files", "storage", "backup", "backups", "data",
     "db", "database", "mysql", "postgres", "mongo", "redis", "elastic",
@@ -403,12 +402,16 @@ async def get_ip_geolocation(ip: str) -> dict | None:
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             response = await client.get(f"http://ip-api.com/json/{ip}")
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("status") == "success":
-                    return data
-        except Exception:
-            pass
+            response.raise_for_status()
+            data = response.json()
+            if data.get("status") == "success":
+                return data
+        except httpx.HTTPStatusError as e:
+            console.print(f"[dim]Geolocation lookup failed for {ip}: HTTP {e.response.status_code}[/dim]")
+        except httpx.RequestError as e:
+            console.print(f"[dim]Geolocation lookup failed for {ip}: {type(e).__name__}[/dim]")
+        except json.JSONDecodeError as e:
+            console.print(f"[dim]Geolocation lookup failed for {ip}: Invalid JSON response[/dim]")
     return None
 
 
@@ -686,7 +689,7 @@ def compare(
     """
     print_banner()
 
-    console.print(f"\n[bold cyan]Geo-Censorship Detection Mode[/bold cyan]")
+    console.print("\n[bold cyan]Geo-Censorship Detection Mode[/bold cyan]")
     console.print(f"[bold]Domain:[/bold] {domain}")
     console.print(f"[bold]Record type:[/bold] {record_type.value}")
     console.print(f"[bold]Countries:[/bold] {', '.join(countries_list)}")
@@ -1509,10 +1512,10 @@ def doh(
     """
     print_banner()
 
-    console.print(f"\n[bold cyan]DNS over HTTPS Query[/bold cyan]")
+    console.print("\n[bold cyan]DNS over HTTPS Query[/bold cyan]")
     console.print(f"[bold]Domain:[/bold] {domain}")
     console.print(f"[bold]Record types:[/bold] {', '.join(rt.value for rt in record_types)}")
-    console.print(f"[dim]Using encrypted HTTPS connections...[/dim]\n")
+    console.print("[dim]Using encrypted HTTPS connections...[/dim]\n")
 
     # Filter providers if specified
     if provider:
@@ -1620,7 +1623,7 @@ def brute(
     """
     print_banner()
 
-    console.print(f"\n[bold cyan]Subdomain Enumeration[/bold cyan]")
+    console.print("\n[bold cyan]Subdomain Enumeration[/bold cyan]")
     console.print(f"[bold]Target:[/bold] {domain}")
 
     # Load wordlist
@@ -1785,7 +1788,7 @@ def watch(
     """
     print_banner()
 
-    console.print(f"\n[bold cyan]Live DNS Monitor[/bold cyan]")
+    console.print("\n[bold cyan]Live DNS Monitor[/bold cyan]")
     console.print(f"[bold]Domain:[/bold] {domain}")
     console.print(f"[bold]Record type:[/bold] {record_type.value}")
     console.print(f"[bold]Refresh interval:[/bold] {interval}s")
@@ -1893,7 +1896,7 @@ def map(
     """
     print_banner()
 
-    console.print(f"\n[bold cyan]Network Path Mapping[/bold cyan]")
+    console.print("\n[bold cyan]Network Path Mapping[/bold cyan]")
     console.print(f"[bold]Target:[/bold] {target}\n")
 
     # Determine if target is IP or domain
