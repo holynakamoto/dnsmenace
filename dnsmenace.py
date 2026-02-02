@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 import csv
 import json
-import re
 import socket
 import sys
 from dataclasses import dataclass, field
