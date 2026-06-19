@@ -325,6 +325,7 @@ async def run_doh_queries(
     providers: list[DoHProvider],
     fqdn: str,
     record_types: list[RecordType],
+    quiet: bool = False,
 ) -> list[DNSResult]:
     """Run DoH queries against multiple providers concurrently."""
     tasks = []
@@ -333,12 +334,13 @@ async def run_doh_queries(
         for rtype in record_types:
             tasks.append(query_doh(provider, fqdn, rtype))
 
+    progress_console = Console(stderr=True) if quiet else console
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TaskProgressColumn(),
-        console=console,
+        console=progress_console,
     ) as progress:
         task = progress.add_task(
             "[cyan]Querying DoH providers...",
@@ -419,6 +421,7 @@ async def run_dns_queries(
     nameservers: list[NameServer],
     fqdn: str,
     record_types: list[RecordType],
+    quiet: bool = False,
 ) -> list[DNSResult]:
     """Run DNS queries against multiple nameservers concurrently."""
     tasks = []
@@ -427,12 +430,13 @@ async def run_dns_queries(
         for rtype in record_types:
             tasks.append(query_dns(ns, fqdn, rtype))
 
+    progress_console = Console(stderr=True) if quiet else console
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TaskProgressColumn(),
-        console=console,
+        console=progress_console,
     ) as progress:
         task = progress.add_task(
             "[cyan]Querying DNS servers...",
@@ -606,36 +610,46 @@ def query(
     Example:
         dnsmenace query -c DE -d google.com -t A -t AAAA
     """
-    print_banner()
+    machine_readable = output in (OutputFormat.JSON, OutputFormat.CSV)
+
+    if not machine_readable:
+        print_banner()
 
     # Validate country code
     try:
         country_info = countries.get(country.upper())
-        console.print(f"\n[bold]Querying DNS servers from:[/bold] {country_info.name} ({country.upper()})")
+        if not machine_readable:
+            console.print(f"\n[bold]Querying DNS servers from:[/bold] {country_info.name} ({country.upper()})")
     except KeyError:
         console.print(f"[red]Invalid country code: {country}[/red]")
         console.print("Use 'dnsmenace countries-list' to see available codes.")
         raise typer.Exit(1)
 
-    console.print(f"[bold]Domain:[/bold] {domain}")
-    console.print(f"[bold]Record types:[/bold] {', '.join(rt.value for rt in record_types)}")
-    console.print()
+    if not machine_readable:
+        console.print(f"[bold]Domain:[/bold] {domain}")
+        console.print(f"[bold]Record types:[/bold] {', '.join(rt.value for rt in record_types)}")
+        console.print()
 
     # Fetch nameservers
-    with console.status("[bold green]Fetching nameservers..."):
+    if machine_readable:
         nameservers = asyncio.run(fetch_nameservers(country, limit))
+    else:
+        with console.status("[bold green]Fetching nameservers..."):
+            nameservers = asyncio.run(fetch_nameservers(country, limit))
 
     if not nameservers:
         console.print("[red]No nameservers found for this country.[/red]")
         raise typer.Exit(1)
 
-    console.print(f"[green]Found {len(nameservers)} nameservers[/green]\n")
+    if not machine_readable:
+        console.print(f"[green]Found {len(nameservers)} nameservers[/green]\n")
 
     # Run DNS queries
-    results = asyncio.run(run_dns_queries(nameservers, domain, record_types))
+    results = asyncio.run(run_dns_queries(nameservers, domain, record_types, quiet=machine_readable))
 
     # Display results
-    console.print()
+    if not machine_readable:
+        console.print()
     if output == OutputFormat.TABLE:
         display_results_table(results)
     elif output == OutputFormat.JSON:
@@ -644,8 +658,9 @@ def query(
         display_results_csv(results)
 
     # Summary
-    successful = sum(1 for r in results if not r.error)
-    console.print(f"\n[dim]Completed: {successful}/{len(results)} queries successful[/dim]")
+    if not machine_readable:
+        successful = sum(1 for r in results if not r.error)
+        console.print(f"\n[dim]Completed: {successful}/{len(results)} queries successful[/dim]")
 
 
 @app.command()
@@ -1383,7 +1398,10 @@ def bulk(
         dnsmenace bulk domains.txt
         dnsmenace bulk domains.txt -t MX -o json
     """
-    print_banner()
+    machine_readable = output in (OutputFormat.JSON, OutputFormat.CSV)
+
+    if not machine_readable:
+        print_banner()
 
     if not file.exists():
         console.print(f"[red]File not found: {file}[/red]")
@@ -1395,8 +1413,9 @@ def bulk(
         console.print("[red]No domains found in file[/red]")
         raise typer.Exit(1)
 
-    console.print(f"\n[bold]Bulk DNS Lookup[/bold]")
-    console.print(f"[dim]Processing {len(domains)} domain(s)...[/dim]\n")
+    if not machine_readable:
+        console.print(f"\n[bold]Bulk DNS Lookup[/bold]")
+        console.print(f"[dim]Processing {len(domains)} domain(s)...[/dim]\n")
 
     async def bulk_lookup():
         resolver = dns.asyncresolver.Resolver()
@@ -1510,12 +1529,14 @@ def doh(
         dnsmenace doh google.com
         dnsmenace doh example.com -t A -t AAAA -p cloudflare
     """
-    print_banner()
+    machine_readable = output in (OutputFormat.JSON, OutputFormat.CSV)
 
-    console.print("\n[bold cyan]DNS over HTTPS Query[/bold cyan]")
-    console.print(f"[bold]Domain:[/bold] {domain}")
-    console.print(f"[bold]Record types:[/bold] {', '.join(rt.value for rt in record_types)}")
-    console.print("[dim]Using encrypted HTTPS connections...[/dim]\n")
+    if not machine_readable:
+        print_banner()
+        console.print("\n[bold cyan]DNS over HTTPS Query[/bold cyan]")
+        console.print(f"[bold]Domain:[/bold] {domain}")
+        console.print(f"[bold]Record types:[/bold] {', '.join(rt.value for rt in record_types)}")
+        console.print("[dim]Using encrypted HTTPS connections...[/dim]\n")
 
     # Filter providers if specified
     if provider:
@@ -1529,10 +1550,11 @@ def doh(
     else:
         providers = DOH_PROVIDERS
 
-    results = asyncio.run(run_doh_queries(providers, domain, record_types))
+    results = asyncio.run(run_doh_queries(providers, domain, record_types, quiet=machine_readable))
 
     # Display results
-    console.print()
+    if not machine_readable:
+        console.print()
     if output == OutputFormat.TABLE:
         table = Table(
             title="DoH Query Results",
@@ -1570,9 +1592,10 @@ def doh(
         display_results_csv(results)
 
     # Summary
-    successful = sum(1 for r in results if not r.error)
-    console.print(f"\n[dim]Completed: {successful}/{len(results)} queries successful[/dim]")
-    console.print("[dim]All queries used encrypted HTTPS (DoH)[/dim]")
+    if not machine_readable:
+        successful = sum(1 for r in results if not r.error)
+        console.print(f"\n[dim]Completed: {successful}/{len(results)} queries successful[/dim]")
+        console.print("[dim]All queries used encrypted HTTPS (DoH)[/dim]")
 
 
 @app.command()

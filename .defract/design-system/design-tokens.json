@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "generator": "defract-design-system-extractor",
+    "source": "Rich terminal UI markup extracted from dnsmenace.py — no CSS or web design tokens present",
+    "extractedAt": "2026-06-19T00:00:00Z",
+    "notes": "This project is a Python CLI tool. All design conventions are Rich library terminal colors and components, not CSS tokens."
+  },
+  "colors": {
+    "cyan": {
+      "value": "cyan",
+      "type": "color",
+      "role": "primary accent — nameserver names, country names, section headers"
+    },
+    "magenta": {
+      "value": "bold magenta",
+      "type": "color",
+      "role": "table headers"
+    },
+    "yellow": {
+      "value": "yellow",
+      "type": "color",
+      "role": "DNS record types, warning states"
+    },
+    "green": {
+      "value": "green",
+      "type": "color",
+      "role": "DNS responses, success states, consistent results"
+    },
+    "blue": {
+      "value": "blue",
+      "type": "color",
+      "role": "latency/timing, info status"
+    },
+    "red": {
+      "value": "red",
+      "type": "color",
+      "role": "errors, failures, security vulnerabilities"
+    },
+    "dim": {
+      "value": "dim",
+      "type": "color",
+      "role": "secondary/de-emphasized text, IP addresses, metadata"
+    },
+    "white": {
+      "value": "white",
+      "type": "color",
+      "role": "neutral field values, fallback"
+    }
+  },
+  "semanticColors": {
+    "status-pass": {
+      "value": "green",
+      "type": "color",
+      "icon": "✓"
+    },
+    "status-warn": {
+      "value": "yellow",
+      "type": "color",
+      "icon": "!"
+    },
+    "status-fail": {
+      "value": "red",
+      "type": "color",
+      "icon": "✗"
+    },
+    "status-info": {
+      "value": "blue",
+      "type": "color",
+      "icon": "ℹ"
+    },
+    "panel-success": {
+      "value": "green",
+      "type": "borderColor"
+    },
+    "panel-warning": {
+      "value": "yellow",
+      "type": "borderColor"
+    },
+    "panel-danger": {
+      "value": "red",
+      "type": "borderColor"
+    }
+  },
+  "components": {
+    "tableStylePrimary": {
+      "value": "box.ROUNDED",
+      "type": "richBoxStyle",
+      "headerStyle": "bold magenta"
+    },
+    "tableStyleSecondary": {
+      "value": "box.SIMPLE",
+      "type": "richBoxStyle"
+    }
+  },
+  "typography": {},
+  "spacing": {},
+  "breakpoints": {},
+  "shadows": {},
+  "borders": {},
+  "zIndex": {}
+}
