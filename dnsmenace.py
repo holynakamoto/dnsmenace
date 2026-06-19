@@ -2231,5 +2231,8 @@ def main(
         ))
 
 
+cli = typer.Typer(add_completion=False, rich_markup_mode="rich")
+cli.add_typer(app, name="dnsmenace")
+
 if __name__ == "__main__":
-    app()
+    cli()
