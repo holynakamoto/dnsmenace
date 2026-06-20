@@ -8,6 +8,7 @@ labels: []
 groomingStatus: completed
 createdAt: 2026-06-19T19:08:39Z
 groomedAt: 2026-06-19T19:08:39Z
+promotedTaskId: task-add-record-type-support-to-the-brute-01kvkg5j5xry
 ---
 
 Add a `--type` / `-t` option to the `brute` command (mirroring other commands) so users can enumerate subdomains by record type beyond A — for example MX or CNAME — and update the results table to show the queried type.
