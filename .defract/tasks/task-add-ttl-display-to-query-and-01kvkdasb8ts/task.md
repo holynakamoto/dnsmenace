@@ -3,7 +3,7 @@ defract:
   id: task-add-ttl-display-to-query-and-01kvkdasb8ts
   type: improvement
   status: active
-  stage: implementation
+  stage: review
   phase: 0
   total_phases: 1
   priority: normal
@@ -150,3 +150,48 @@ None. All changes are confined to `dnsmenace.py` and the existing dnspython `Ans
 5. `display_results_json` and `display_results_csv` — not modified; both manually construct output dicts/rows, so the new `ttl` field is never exposed.
 
 **Test results:** 32/32 passed (test_scenarios.py). Zero new ruff warnings, zero new mypy errors.
+
+## Review
+
+## Verdict
+
+**Verdict:** APPROVE
+**Files reviewed:** 1 files changed across 1 phases
+
+All 7 acceptance criteria pass. The TTL field is correctly added to DNSResult with a None guard in query_dns, both target tables display the new column between Response and Time (ms), and JSON/CSV output formats are unchanged. No new mypy or ruff issues introduced.
+
+### Automated Checks
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Ruff lint | PASS | 39 pre-existing warnings, 0 new on changed lines |
+| mypy type check | PASS | 29 pre-existing errors, 0 new in changed code |
+
+### Acceptance Criteria (7/7 passed)
+
+- [x] AC-1: `dnsmenace query example.com` produces a table with a "TTL (s)" column showing a positive integer for each successful answer — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2` — TTL column present showing 300 for dns.google row, "-" for timed-out row
+- [x] AC-2: `dnsmenace propagation example.com` produces a table with a "TTL (s)" column showing a positive integer for each resolver that returned a result — PASS: Ran `python3 dnsmenace.py dnsmenace propagation example.com` — TTL column present showing 200-300 range for all 7 successful resolvers, "-" for timed-out Alternate DNS row
+- [x] AC-3: A query for a non-existent domain (e.g. `dnsmenace query nonexistent.invalid`) shows "-" in the TTL column for every row with no Python traceback — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d nonexistent.invalid -l 2` — both rows show "-" in TTL column (NXDOMAIN and Timeout), no traceback
+- [x] AC-4: `dnsmenace query example.com --output json` produces output with no `ttl` key (format is identical to before this change) — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2 --output json` — keys are nameserver, query, record_type, answers, error, response_time_ms; no ttl key present
+- [x] AC-5: `dnsmenace query example.com --output csv` produces output with no `ttl` column (format is identical to before this change) — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2 --output csv` — header row is nameserver_ip,nameserver_name,record_type,answers,error,response_time_ms; no ttl column
+- [x] AC-6: `mypy dnsmenace.py` passes with no new type errors — PASS: mypy reports 29 errors, all pre-existing (lines 1985, 1990, 2067, 2068 and others far from changed lines 94, 229-230, 471, 480, 1372, 1384); no errors on new code
+- [x] AC-7: `ruff check dnsmenace.py` passes with no new warnings — PASS: ruff reports 39 errors, none on changed lines (94, 229-230, 471, 480, 1372, 1384); grep for new line numbers returned empty
+
+### Code Quality (Refactor Review)
+
+No code quality issues found in changed files.
+
+### Security Assessment (Security Review)
+
+No security issues found in changed files.
+
+### Decisions Made During Implementation
+
+- TTL stored as a single `int | None` field on `DNSResult` rather than a parallel list — all records in a DNS RRset share one TTL value
+- Only `query_dns` modified (not `query_dns_simple` or `query_doh`) — only `query_dns` feeds the two target tables
+- JSON and CSV outputs manually construct output dicts/rows without `dataclasses.asdict`, so the new ttl field is never exposed in those formats
+
+## Required Changes
+
+None.
+
