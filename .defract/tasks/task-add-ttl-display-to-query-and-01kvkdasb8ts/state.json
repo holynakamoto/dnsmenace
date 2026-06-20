@@ -1,11 +1,11 @@
 {
   "id": "task-add-ttl-display-to-query-and-01kvkdasb8ts",
-  "status": "active",
+  "status": "completed",
   "stage": "release",
   "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:00:05Z",
-  "updatedAt": "2026-06-20T21:41:03Z",
+  "updatedAt": "2026-06-20T21:49:27Z",
   "events": [
     {
       "base_branch": "master",
@@ -431,6 +431,28 @@
       "type": "stage_work_complete",
       "worktree_head": "135fd2f87b83cbf0526eba37de2a68f7fae16ecc",
       "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "files_changed": 1,
+      "lines_added": 9,
+      "lines_removed": 0,
+      "timestamp": "2026-06-20T21:49:26Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T21:49:26Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-add-ttl-display-to-query-and-01kvkdasb8ts",
+      "timestamp": "2026-06-20T21:49:27Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T21:49:27Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -448,22 +470,23 @@
     "rationale": "CLI-only feature addition touching a single file — no UI design decisions (skip design), well-contained to one dataclass field and two table functions (skip architecture). The changes follow an established pattern already present in the zone-transfer display."
   },
   "stageApprovals": {
-    "implementation": "2026-06-20T21:33:30Z",
     "review": "2026-06-20T21:38:59Z",
+    "implementation": "2026-06-20T21:33:30Z",
     "scope": "2026-06-20T21:20:36Z"
   },
+  "completedAt": "2026-06-20T21:49:27Z",
   "stageContent": {
-    "implementation": "## Phase 1: Add TTL column to query and propagation tables\n\n**Files modified:** `dnsmenace.py`\n\n**Changes:**\n\n1. `DNSResult` dataclass (line 91) — added `ttl: int | None = None` as a trailing field using the existing `= None` pattern; no `field()` wrapper needed since it is a scalar default.\n\n2. `query_dns` success path — after populating `result.answers`, captures `answers.rrset.ttl` into `result.ttl`, guarded with `if answers.rrset is not None`. Error paths leave `ttl` as `None`.\n\n3. `display_results_table` — added a right-justified \"TTL (s)\" column (style: magenta) between Response and Time (ms). Each row shows `str(result.ttl)` when set, `\"-\"` when `None`. Zero-TTL records display as `\"0\"` correctly.\n\n4. Propagation inline table — same column added in the same position with the same logic.\n\n5. `display_results_json` and `display_results_csv` — not modified; both manually construct output dicts/rows, so the new `ttl` field is never exposed.\n\n**Test results:** 32/32 passed (test_scenarios.py). Zero new ruff warnings, zero new mypy errors.",
     "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 1 files changed across 1 phases\n\nAll 7 acceptance criteria pass. The TTL field is correctly added to DNSResult with a None guard in query_dns, both target tables display the new column between Response and Time (ms), and JSON/CSV output formats are unchanged. No new mypy or ruff issues introduced.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Ruff lint | PASS | 39 pre-existing warnings, 0 new on changed lines |\n| mypy type check | PASS | 29 pre-existing errors, 0 new in changed code |\n\n### Acceptance Criteria (7/7 passed)\n\n- [x] AC-1: `dnsmenace query example.com` produces a table with a \"TTL (s)\" column showing a positive integer for each successful answer — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2` — TTL column present showing 300 for dns.google row, \"-\" for timed-out row\n- [x] AC-2: `dnsmenace propagation example.com` produces a table with a \"TTL (s)\" column showing a positive integer for each resolver that returned a result — PASS: Ran `python3 dnsmenace.py dnsmenace propagation example.com` — TTL column present showing 200-300 range for all 7 successful resolvers, \"-\" for timed-out Alternate DNS row\n- [x] AC-3: A query for a non-existent domain (e.g. `dnsmenace query nonexistent.invalid`) shows \"-\" in the TTL column for every row with no Python traceback — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d nonexistent.invalid -l 2` — both rows show \"-\" in TTL column (NXDOMAIN and Timeout), no traceback\n- [x] AC-4: `dnsmenace query example.com --output json` produces output with no `ttl` key (format is identical to before this change) — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2 --output json` — keys are nameserver, query, record_type, answers, error, response_time_ms; no ttl key present\n- [x] AC-5: `dnsmenace query example.com --output csv` produces output with no `ttl` column (format is identical to before this change) — PASS: Ran `python3 dnsmenace.py dnsmenace query -c US -d example.com -l 2 --output csv` — header row is nameserver_ip,nameserver_name,record_type,answers,error,response_time_ms; no ttl column\n- [x] AC-6: `mypy dnsmenace.py` passes with no new type errors — PASS: mypy reports 29 errors, all pre-existing (lines 1985, 1990, 2067, 2068 and others far from changed lines 94, 229-230, 471, 480, 1372, 1384); no errors on new code\n- [x] AC-7: `ruff check dnsmenace.py` passes with no new warnings — PASS: ruff reports 39 errors, none on changed lines (94, 229-230, 471, 480, 1372, 1384); grep for new line numbers returned empty\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- TTL stored as a single `int | None` field on `DNSResult` rather than a parallel list — all records in a DNS RRset share one TTL value\n- Only `query_dns` modified (not `query_dns_simple` or `query_doh`) — only `query_dns` feeds the two target tables\n- JSON and CSV outputs manually construct output dicts/rows without `dataclasses.asdict`, so the new ttl field is never exposed in those formats\n\n## Required Changes\n\nNone.\n",
+    "implementation": "## Phase 1: Add TTL column to query and propagation tables\n\n**Files modified:** `dnsmenace.py`\n\n**Changes:**\n\n1. `DNSResult` dataclass (line 91) — added `ttl: int | None = None` as a trailing field using the existing `= None` pattern; no `field()` wrapper needed since it is a scalar default.\n\n2. `query_dns` success path — after populating `result.answers`, captures `answers.rrset.ttl` into `result.ttl`, guarded with `if answers.rrset is not None`. Error paths leave `ttl` as `None`.\n\n3. `display_results_table` — added a right-justified \"TTL (s)\" column (style: magenta) between Response and Time (ms). Each row shows `str(result.ttl)` when set, `\"-\"` when `None`. Zero-TTL records display as `\"0\"` correctly.\n\n4. Propagation inline table — same column added in the same position with the same logic.\n\n5. `display_results_json` and `display_results_csv` — not modified; both manually construct output dicts/rows, so the new `ttl` field is never exposed.\n\n**Test results:** 32/32 passed (test_scenarios.py). Zero new ruff warnings, zero new mypy errors.",
     "release": "## Release Notes\n\n### What was built\n- Added `ttl: int | None = None` field to the `DNSResult` dataclass so DNS record cache lifetimes are captured alongside each answer\n- Extended `query_dns` to read `answers.rrset.ttl` on the success path, guarded with a `None` check to handle edge-case empty rrsets\n- Added a right-justified \"TTL (s)\" column between Response and Time (ms) in `display_results_table` — shows the integer TTL or \"-\" for errors and `None` values\n- Added the same \"TTL (s)\" column to the propagation command's inline table with identical heading, justification, and fallback\n- Preserved existing JSON and CSV output formats — both functions manually construct output rows without `dataclasses.asdict`, so the new `ttl` field is never surfaced in those paths\n\n### Key decisions\n- Store TTL as a single `int | None` field on `DNSResult` rather than a parallel list — all records in a DNS RRset share one TTL value\n- Modify only `query_dns`, not `query_dns_simple` or `query_doh` — only `query_dns` feeds the two target tables\n- JSON and CSV outputs manually construct output dicts/rows without `dataclasses.asdict`, so the new ttl field is never exposed in those formats\n\n### Changes by phase\n- **Phase 1: Add TTL column to query and propagation tables** — Added `ttl: int | None = None` to `DNSResult`. Captured TTL from `answers.rrset.ttl` in `query_dns` success path with `None` guard. Added right-justified \"TTL (s)\" column in `display_results_table` and the propagation table. JSON and CSV outputs unchanged (both build rows manually). 32/32 tests passed, zero new ruff warnings, zero new mypy errors.\n\n## Verification\n\n- Production build: PASS — `pyproject-build` produced `dnsmenace-3.0.0.tar.gz` and `dnsmenace-3.0.0-py3-none-any.whl` successfully\n- Review approved: 2026-06-20T21:38:59Z — 7/7 acceptance criteria, ruff and mypy clean on changed lines\n- Code committed: `4617efd feat(task-add-ttl-display-to-query-and-01kvkdasb8ts): phase 1 — Add TTL column to query and propagation tables`\n- Branch pushed: `feature/task-add-ttl-display-to-query-and-01kvkdasb8ts` pushed to `origin` successfully"
   },
   "stages": {
-    "design": {
-      "status": "skipped"
-    },
     "release": {
       "status": "awaiting_approval",
       "startedAt": "2026-06-20T21:39:00Z"
+    },
+    "design": {
+      "status": "skipped"
     },
     "architecture": {
       "status": "skipped"
@@ -484,8 +507,6 @@
       "startedAt": "2026-06-20T21:15:02Z"
     }
   },
-  "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-ttl-display-to-query-and-01kvkdasb8ts",
-  "worktreeBaseBranch": "master",
   "worktreeLastSyncedAt": "2026-06-20T21:39:00Z",
   "reviewPayload": {
     "verdict": "approve",

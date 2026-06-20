@@ -91,6 +91,7 @@ class DNSResult:
     answers: list[str] = field(default_factory=list)
     error: str | None = None
     response_time_ms: float = 0.0
+    ttl: int | None = None
 
 
 @dataclass
@@ -225,6 +226,8 @@ async def query_dns(
         answers = await resolver.resolve(fqdn, record_type.value)
         result.answers = [str(rdata) for rdata in answers]
         result.response_time_ms = (time.perf_counter() - start_time) * 1000
+        if answers.rrset is not None:
+            result.ttl = answers.rrset.ttl
     except dns.resolver.NXDOMAIN:
         result.error = "Domain does not exist"
     except dns.resolver.NoAnswer:
@@ -465,6 +468,7 @@ def display_results_table(results: list[DNSResult]) -> None:
     table.add_column("IP", style="dim")
     table.add_column("Type", style="yellow")
     table.add_column("Response", style="green")
+    table.add_column("TTL (s)", justify="right", style="magenta")
     table.add_column("Time (ms)", justify="right", style="blue")
 
     for result in results:
@@ -473,6 +477,7 @@ def display_results_table(results: list[DNSResult]) -> None:
         else:
             response = Text("\n".join(result.answers) if result.answers else "No data")
 
+        ttl_str = str(result.ttl) if result.ttl is not None else "-"
         time_str = f"{result.response_time_ms:.1f}" if not result.error else "-"
 
         table.add_row(
@@ -480,6 +485,7 @@ def display_results_table(results: list[DNSResult]) -> None:
             result.nameserver.ip,
             result.record_type,
             response,
+            ttl_str,
             time_str,
         )
 
@@ -1363,6 +1369,7 @@ def propagation(
     table.add_column("DNS Provider", style="cyan")
     table.add_column("Location", style="dim")
     table.add_column("Response", style="green")
+    table.add_column("TTL (s)", justify="right", style="magenta")
     table.add_column("Time (ms)", justify="right", style="blue")
 
     all_responses = []
@@ -1374,12 +1381,14 @@ def propagation(
             response = Text("\n".join(result.answers) if result.answers else "No data")
             all_responses.append(sorted(result.answers))
 
+        ttl_str = str(result.ttl) if result.ttl is not None else "-"
         time_str = f"{result.response_time_ms:.1f}" if not result.error else "-"
 
         table.add_row(
             result.nameserver.name,
             result.nameserver.country,
             response,
+            ttl_str,
             time_str,
         )
 
