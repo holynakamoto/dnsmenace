@@ -3,7 +3,7 @@ defract:
   id: task-add-ttl-display-to-query-and-01kvkdasb8ts
   type: improvement
   status: active
-  stage: review
+  stage: release
   phase: 0
   total_phases: 1
   priority: normal
@@ -195,3 +195,28 @@ No security issues found in changed files.
 
 None.
 
+## Release
+
+## Release Notes
+
+### What was built
+- Added `ttl: int | None = None` field to the `DNSResult` dataclass so DNS record cache lifetimes are captured alongside each answer
+- Extended `query_dns` to read `answers.rrset.ttl` on the success path, guarded with a `None` check to handle edge-case empty rrsets
+- Added a right-justified "TTL (s)" column between Response and Time (ms) in `display_results_table` — shows the integer TTL or "-" for errors and `None` values
+- Added the same "TTL (s)" column to the propagation command's inline table with identical heading, justification, and fallback
+- Preserved existing JSON and CSV output formats — both functions manually construct output rows without `dataclasses.asdict`, so the new `ttl` field is never surfaced in those paths
+
+### Key decisions
+- Store TTL as a single `int | None` field on `DNSResult` rather than a parallel list — all records in a DNS RRset share one TTL value
+- Modify only `query_dns`, not `query_dns_simple` or `query_doh` — only `query_dns` feeds the two target tables
+- JSON and CSV outputs manually construct output dicts/rows without `dataclasses.asdict`, so the new ttl field is never exposed in those formats
+
+### Changes by phase
+- **Phase 1: Add TTL column to query and propagation tables** — Added `ttl: int | None = None` to `DNSResult`. Captured TTL from `answers.rrset.ttl` in `query_dns` success path with `None` guard. Added right-justified "TTL (s)" column in `display_results_table` and the propagation table. JSON and CSV outputs unchanged (both build rows manually). 32/32 tests passed, zero new ruff warnings, zero new mypy errors.
+
+## Verification
+
+- Production build: PASS — `pyproject-build` produced `dnsmenace-3.0.0.tar.gz` and `dnsmenace-3.0.0-py3-none-any.whl` successfully
+- Review approved: 2026-06-20T21:38:59Z — 7/7 acceptance criteria, ruff and mypy clean on changed lines
+- Code committed: `4617efd feat(task-add-ttl-display-to-query-and-01kvkdasb8ts): phase 1 — Add TTL column to query and propagation tables`
+- Branch pushed: `feature/task-add-ttl-display-to-query-and-01kvkdasb8ts` pushed to `origin` successfully
