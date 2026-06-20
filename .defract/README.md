@@ -6,7 +6,7 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 | Task | Stage | Status |
 |------|-------|--------|
-| Add --min-reliability filter to the query command | scope | active |
+| Add --min-reliability filter to the query command | release | completed |
 
 
 ## Reading without defract
