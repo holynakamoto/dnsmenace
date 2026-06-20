@@ -1,11 +1,11 @@
 {
   "id": "task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z",
   "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "stage": "review",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T02:29:01Z",
-  "updatedAt": "2026-06-20T02:36:10Z",
+  "updatedAt": "2026-06-20T18:49:13Z",
   "events": [
     {
       "base_branch": "master",
@@ -247,6 +247,77 @@
       "type": "phase_awaiting_approval",
       "worktree_head": "c76bc79c550a1d70c284518818311060959c5428",
       "worktree_status_digest": "7a70df149c6e4132812b89e3a5fb00f64fee99f468d82ad36f890c9aa6c4d7ba"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Wire reliability filtering into the query command",
+      "timestamp": "2026-06-20T18:49:12Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-20T18:49:12Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-20T18:49:12Z",
+      "type": "stage_work_complete",
+      "worktree_head": "87f003d5b75f8a3b165603578a54fcbdbfd4c47d",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 3,
+      "timestamp": "2026-06-20T18:49:13Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T18:49:12Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "22618627320b352e4c5720a3f1908e23c072baa9",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "87f003d5b75f8a3b165603578a54fcbdbfd4c47d",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T18:49:13Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T18:49:13Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-20T18:49:13Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T18:49:13Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvk5v5htdtj8fef2eft2bvep",
+      "stage": "review",
+      "timestamp": "2026-06-20T18:49:13Z",
+      "type": "stage_agent_started"
     }
   ],
   "needsArchitecture": false,
@@ -264,35 +335,38 @@
     "rationale": "New CLI option added to a single Python module with no UI changes — skip design. The change is well-contained to one file and follows an established pattern (Typer Annotated options, existing empty-list guard) — skip architecture. Standard review and release gates remain."
   },
   "stageApprovals": {
+    "implementation": "2026-06-20T18:49:12Z",
     "scope": "2026-06-20T02:33:32Z"
   },
   "stageContent": {
     "implementation": "## Phase 1: Wire reliability filtering into the query command\n\n**Files changed:** `dnsmenace.py`\n\n**What was built:**\n\n1. Added `min_reliability: Annotated[float | None, typer.Option(\"--min-reliability\", min=0.0, max=1.0, ...)] = None` parameter to the `query` command. Typer enforces the 0.0–1.0 range automatically and returns a clean error for out-of-range values.\n\n2. Added filtering block between the `fetch_nameservers` call and the \"Found N nameservers\" display line. When `min_reliability` is set, nameservers with `reliability < min_reliability` are dropped. If the filtered pool is empty, a message naming the threshold and the count of servers checked is printed and the command exits with code 1.\n\n**Deviations from plan:** None. The help text notes the `--limit`-first interaction as specified. The threshold comparison is inclusive (`>=`) per the scope decision.\n\n**Pre-existing lint/type issues:** ruff reports 39 and mypy reports 29 pre-existing errors. Zero new errors were introduced by this change (all errors fall outside lines 603–670)."
   },
   "stages": {
-    "review": {
-      "status": "not_started"
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T18:49:12Z",
+      "startedAt": "2026-06-20T02:33:32Z"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T02:33:32Z",
       "startedAt": "2026-06-20T02:29:48Z"
     },
+    "release": {
+      "status": "not_started"
+    },
+    "review": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T18:49:13Z"
+    },
     "design": {
       "status": "skipped"
     },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T02:33:32Z"
-    },
     "architecture": {
       "status": "skipped"
-    },
-    "release": {
-      "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z",
   "worktreeBaseBranch": "master",
-  "worktreeLastSyncedAt": "2026-06-20T02:33:32Z"
+  "worktreeLastSyncedAt": "2026-06-20T18:49:13Z"
 }

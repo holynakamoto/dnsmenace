@@ -3,7 +3,7 @@ defract:
   id: task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z
   type: improvement
   status: active
-  stage: implementation
+  stage: review
   phase: 0
   total_phases: 1
   priority: normal
@@ -14,6 +14,7 @@ defract:
   created_by: holynakamoto
   assignee: holynakamoto
 ---
+
 
 ## Story Brief
 
