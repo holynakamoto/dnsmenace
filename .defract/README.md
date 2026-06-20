@@ -4,7 +4,10 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 ## Tasks
 
-No tasks yet.
+| Task | Stage | Status |
+|------|-------|--------|
+| Add --min-reliability filter to the query command | scope | active |
+
 
 ## Reading without defract
 
