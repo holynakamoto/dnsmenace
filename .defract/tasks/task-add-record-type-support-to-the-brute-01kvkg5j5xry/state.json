@@ -1,11 +1,11 @@
 {
   "id": "task-add-record-type-support-to-the-brute-01kvkg5j5xry",
   "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "stage": "release",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:49:40Z",
-  "updatedAt": "2026-06-20T22:04:57Z",
+  "updatedAt": "2026-06-20T22:12:08Z",
   "events": [
     {
       "base_branch": "master",
@@ -248,6 +248,140 @@
       "type": "phase_awaiting_approval",
       "worktree_head": "8d48d07f8e85f58c1b4a7c1ff431e63c8b85c363",
       "worktree_status_digest": "7a70df149c6e4132812b89e3a5fb00f64fee99f468d82ad36f890c9aa6c4d7ba"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Add --type option to the brute command",
+      "timestamp": "2026-06-20T22:07:00Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-20T22:07:00Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-20T22:07:00Z",
+      "type": "stage_work_complete",
+      "worktree_head": "c35fc553a35193753404020f5f4c4b1eaabbc2f8",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T22:07:01Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:07:00Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "cc3b2c0bb329f61dea5c5b8ccc2695e3a02685b3",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "c35fc553a35193753404020f5f4c4b1eaabbc2f8",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T22:07:01Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:07:01Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-20T22:07:01Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:07:01Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkh5bfx5wvd01c916zk4zt2",
+      "stage": "review",
+      "timestamp": "2026-06-20T22:07:01Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "details": "32/32 pytest scenarios passed. Ruff and mypy both have errors (39 and 29 respectively) but all are pre-existing — master shows identical counts, confirming this task introduced no new lint or type issues.",
+      "failed": 0,
+      "passed": 32,
+      "phase": 1,
+      "skipped": 0,
+      "timestamp": "2026-06-20T22:10:57Z",
+      "type": "test_results"
+    },
+    {
+      "change_summary": "APPROVE: All six acceptance criteria are satisfied: `--type`/`-t` is wired up, both query paths use the parameterised type, the table title and column are updated, and JSON/CSV carry the `type` field. 32/32 tests pass; no new ruff or mypy errors introduced.",
+      "revision": 1,
+      "stage": "review",
+      "timestamp": "2026-06-20T22:11:39Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Review verdict: APPROVE",
+      "rationale": "6/6 acceptance criteria passed, 32/32 pytest scenarios passed. Ruff (39 errors) and mypy (29 errors) both fail but are pre-existing baseline issues confirmed by identical counts on master — zero new issues from this task. Implementation follows project conventions exactly, matching the Annotated/typer.Option pattern used by compare and propagation commands.",
+      "timestamp": "2026-06-20T22:11:45Z",
+      "type": "decision"
+    },
+    {
+      "stage": "review",
+      "summary": "APPROVE — 6/6 ACs pass, 32/32 tests pass, no new lint or type issues. Implementation is clean and follows project conventions throughout.",
+      "timestamp": "2026-06-20T22:11:51Z",
+      "type": "stage_work_complete",
+      "worktree_head": "cc3b2c0bb329f61dea5c5b8ccc2695e3a02685b3",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:12:08Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "actor": null,
+      "stage": "review",
+      "timestamp": "2026-06-20T22:12:08Z",
+      "type": "stage_approved"
+    },
+    {
+      "from": "review",
+      "timestamp": "2026-06-20T22:12:08Z",
+      "to": "release",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:12:08Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkheq4bf2smqz2wzbzhzphn",
+      "stage": "release",
+      "timestamp": "2026-06-20T22:12:08Z",
+      "type": "stage_agent_started"
     }
   ],
   "needsArchitecture": false,
@@ -265,35 +399,119 @@
     "rationale": "Adding a CLI parameter and threading it through one function in one file — no web UI changes (skip design), touches a single well-understood subsystem with no new boundaries (skip architecture). Standard backend-feature pipeline is the right fit."
   },
   "stageApprovals": {
+    "review": "2026-06-20T22:12:08Z",
+    "implementation": "2026-06-20T22:07:00Z",
     "scope": "2026-06-20T22:00:47Z"
   },
   "stageContent": {
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 1 files changed across 1 phases\n\nAll six acceptance criteria are satisfied: `--type`/`-t` is wired up, both query paths use the parameterised type, the table title and column are updated, and JSON/CSV carry the `type` field. 32/32 tests pass; no new ruff or mypy errors introduced.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Pytest (32 scenarios) | PASS | 32/32 passed in 103s |\n| Ruff lint | FAIL | 39 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes |\n| Mypy type check | FAIL | 29 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes |\n\n### Acceptance Criteria (6/6 passed)\n\n- [x] AC-1: Running `dnsmenace brute example.com --type MX` (or `-t MX`) executes without error and queries MX records for each subdomain candidate. — PASS: dnsmenace.py:1661-1667 declares `typer.Option(\"--type\", \"-t\")` with `RecordType` type. DoH path at line 1754 passes `record_type` to `query_doh`; resolver path at line 1763 passes `record_type.value` to `resolver.resolve`. Closure captures `record_type` from brute scope correctly.\n- [x] AC-2: Running `dnsmenace brute example.com` with no `--type` queries A records, preserving existing behavior. — PASS: dnsmenace.py:1667 sets `= RecordType.A` as the default. test_S30 runs `brute google.com --doh` (no `--type`) and passes, confirming default A behavior is preserved.\n- [x] AC-3: The results table title contains the record type string (e.g., \"MX\") when `--type MX` is used. — PASS: dnsmenace.py:1792 sets table title to `f\"Discovered Subdomains for {domain} ({record_type.value})\"`. When `--type MX`, `record_type.value` is `\"MX\"`, producing `\"Discovered Subdomains for example.com (MX)\"`.\n- [x] AC-4: The results table column formerly labelled \"IP Address(es)\" is now labelled \"Records\". — PASS: dnsmenace.py:1799 calls `table.add_column(\"Records\", style=\"green\")`. The old label `\"IP Address(es)\"` is gone from the diff.\n- [x] AC-5: JSON output includes `\"type\": \"MX\"` (or whichever type was queried) on each result object. — PASS: dnsmenace.py:1806-1809 builds each entry as `{\"subdomain\": fqdn, \"addresses\": ips, \"type\": record_type.value}`. The `\"type\"` key is present alongside `\"subdomain\"` and `\"addresses\"`.\n- [x] AC-6: CSV output includes a `\"type\"` column. — PASS: dnsmenace.py:1814 writes header `[\"subdomain\", \"addresses\", \"type\"]`. dnsmenace.py:1816 writes each row as `[fqdn, \"|\".join(ips), record_type.value]`, adding the type value as the third column.\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Use singular RecordType parameter (not list) for brute --type option — multi-type enumeration is explicitly out of scope.\n- Rename table column to \"Records\" and include record type in table title — type-agnostic label that works for MX (priority+hostname), CNAME (domain), A (IP), and all other record types.\n- record_type captured as closure variable by check_one — no refactor of inline DNS logic needed, matching existing pattern.\n\n## Required Changes\n\nNone.\n",
     "implementation": "## Phase 1: Add --type option to the brute command\n\n**Files changed:** `dnsmenace.py`\n\n**Changes made:**\n\n1. Added `record_type: Annotated[RecordType, typer.Option(\"--type\", \"-t\", help=\"DNS record type to query\")] = RecordType.A` parameter to the `brute` function (between the `country` and `output` parameters), matching the pattern used by `compare` and `propagation` commands.\n\n2. Updated `check_one` closure to use `record_type` (enum value) for the DoH path (`query_doh`) and `record_type.value` (string) for the resolver path (`resolver.resolve`), replacing the two hardcoded literals `RecordType.A` and `\"A\"`.\n\n3. Renamed table column from `\"IP Address(es)\"` to `\"Records\"` — type-agnostic label that works for MX, CNAME, A, and all other record types.\n\n4. Updated table title to `f\"Discovered Subdomains for {domain} ({record_type.value})\"` — shows queried type in parentheses.\n\n5. Updated JSON output: `{\"subdomain\": fqdn, \"addresses\": ips, \"type\": record_type.value}` — adds `\"type\"` field alongside existing fields.\n\n6. Updated CSV header row to `[\"subdomain\", \"addresses\", \"type\"]` and each data row to include `record_type.value` as the third column.\n\n**No deviations from plan.** All 32 pre-existing tests pass; no new ruff or mypy issues introduced."
   },
   "stages": {
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T22:00:48Z"
-    },
     "review": {
-      "status": "not_started"
-    },
-    "design": {
-      "status": "skipped"
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:12:08Z",
+      "startedAt": "2026-06-20T22:07:01Z"
     },
     "architecture": {
       "status": "skipped"
     },
-    "release": {
-      "status": "not_started"
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:07:00Z",
+      "startedAt": "2026-06-20T22:00:48Z"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T22:00:47Z",
       "startedAt": "2026-06-20T21:54:49Z"
+    },
+    "release": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T22:12:08Z"
+    },
+    "design": {
+      "status": "skipped"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-record-type-support-to-the-brute-01kvkg5j5xry",
   "worktreeBaseBranch": "master",
-  "worktreeLastSyncedAt": "2026-06-20T22:00:48Z"
+  "worktreeLastSyncedAt": "2026-06-20T22:12:08Z",
+  "reviewPayload": {
+    "verdict": "approve",
+    "summary": "All six acceptance criteria are satisfied: `--type`/`-t` is wired up, both query paths use the parameterised type, the table title and column are updated, and JSON/CSV carry the `type` field. 32/32 tests pass; no new ruff or mypy errors introduced.",
+    "filesReviewedCount": 1,
+    "phasesReviewedCount": 1,
+    "automatedChecks": [
+      {
+        "name": "Pytest (32 scenarios)",
+        "result": "pass",
+        "detail": "32/32 passed in 103s"
+      },
+      {
+        "name": "Ruff lint",
+        "result": "fail",
+        "detail": "39 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes"
+      },
+      {
+        "name": "Mypy type check",
+        "result": "fail",
+        "detail": "29 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes"
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "acId": "AC-1",
+        "text": "Running `dnsmenace brute example.com --type MX` (or `-t MX`) executes without error and queries MX records for each subdomain candidate.",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1661-1667 declares `typer.Option(\"--type\", \"-t\")` with `RecordType` type. DoH path at line 1754 passes `record_type` to `query_doh`; resolver path at line 1763 passes `record_type.value` to `resolver.resolve`. Closure captures `record_type` from brute scope correctly."
+      },
+      {
+        "acId": "AC-2",
+        "text": "Running `dnsmenace brute example.com` with no `--type` queries A records, preserving existing behavior.",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1667 sets `= RecordType.A` as the default. test_S30 runs `brute google.com --doh` (no `--type`) and passes, confirming default A behavior is preserved."
+      },
+      {
+        "acId": "AC-3",
+        "text": "The results table title contains the record type string (e.g., \"MX\") when `--type MX` is used.",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1792 sets table title to `f\"Discovered Subdomains for {domain} ({record_type.value})\"`. When `--type MX`, `record_type.value` is `\"MX\"`, producing `\"Discovered Subdomains for example.com (MX)\"`."
+      },
+      {
+        "acId": "AC-4",
+        "text": "The results table column formerly labelled \"IP Address(es)\" is now labelled \"Records\".",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1799 calls `table.add_column(\"Records\", style=\"green\")`. The old label `\"IP Address(es)\"` is gone from the diff."
+      },
+      {
+        "acId": "AC-5",
+        "text": "JSON output includes `\"type\": \"MX\"` (or whichever type was queried) on each result object.",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1806-1809 builds each entry as `{\"subdomain\": fqdn, \"addresses\": ips, \"type\": record_type.value}`. The `\"type\"` key is present alongside `\"subdomain\"` and `\"addresses\"`."
+      },
+      {
+        "acId": "AC-6",
+        "text": "CSV output includes a `\"type\"` column.",
+        "status": "pass",
+        "evidence": "dnsmenace.py:1814 writes header `[\"subdomain\", \"addresses\", \"type\"]`. dnsmenace.py:1816 writes each row as `[fqdn, \"|\".join(ips), record_type.value]`, adding the type value as the third column."
+      }
+    ],
+    "headlineFindings": [],
+    "requiredChanges": [],
+    "codeQualityFindings": [],
+    "securityFindings": [],
+    "decisions": [
+      "Use singular RecordType parameter (not list) for brute --type option — multi-type enumeration is explicitly out of scope.",
+      "Rename table column to \"Records\" and include record type in table title — type-agnostic label that works for MX (priority+hostname), CNAME (domain), A (IP), and all other record types.",
+      "record_type captured as closure variable by check_one — no refactor of inline DNS logic needed, matching existing pattern."
+    ],
+    "revision": 1,
+    "changeAnnotations": [
+      {
+        "file": "dnsmenace.py",
+        "note": "Adds --type/-t RecordType parameter to brute, threads it through the check_one closure (both DoH and resolver paths), renames the IP column to Records, adds type to the table title, and extends JSON and CSV output schemas with the queried record type."
+      }
+    ]
+  }
 }

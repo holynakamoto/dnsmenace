@@ -3,7 +3,7 @@ defract:
   id: task-add-record-type-support-to-the-brute-01kvkg5j5xry
   type: improvement
   status: active
-  stage: implementation
+  stage: release
   phase: 0
   total_phases: 1
   priority: normal
@@ -14,6 +14,7 @@ defract:
   created_by: holynakamoto
   assignee: holynakamoto
 ---
+
 
 ## Story Brief
 
@@ -144,3 +145,48 @@ The `query_dns_simple` helper at line 243 already accepts `record_type: str`. Th
 6. Updated CSV header row to `["subdomain", "addresses", "type"]` and each data row to include `record_type.value` as the third column.
 
 **No deviations from plan.** All 32 pre-existing tests pass; no new ruff or mypy issues introduced.
+
+## Review
+
+## Verdict
+
+**Verdict:** APPROVE
+**Files reviewed:** 1 files changed across 1 phases
+
+All six acceptance criteria are satisfied: `--type`/`-t` is wired up, both query paths use the parameterised type, the table title and column are updated, and JSON/CSV carry the `type` field. 32/32 tests pass; no new ruff or mypy errors introduced.
+
+### Automated Checks
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Pytest (32 scenarios) | PASS | 32/32 passed in 103s |
+| Ruff lint | FAIL | 39 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes |
+| Mypy type check | FAIL | 29 errors — all pre-existing (identical count on master branch); zero new errors from this task's changes |
+
+### Acceptance Criteria (6/6 passed)
+
+- [x] AC-1: Running `dnsmenace brute example.com --type MX` (or `-t MX`) executes without error and queries MX records for each subdomain candidate. — PASS: dnsmenace.py:1661-1667 declares `typer.Option("--type", "-t")` with `RecordType` type. DoH path at line 1754 passes `record_type` to `query_doh`; resolver path at line 1763 passes `record_type.value` to `resolver.resolve`. Closure captures `record_type` from brute scope correctly.
+- [x] AC-2: Running `dnsmenace brute example.com` with no `--type` queries A records, preserving existing behavior. — PASS: dnsmenace.py:1667 sets `= RecordType.A` as the default. test_S30 runs `brute google.com --doh` (no `--type`) and passes, confirming default A behavior is preserved.
+- [x] AC-3: The results table title contains the record type string (e.g., "MX") when `--type MX` is used. — PASS: dnsmenace.py:1792 sets table title to `f"Discovered Subdomains for {domain} ({record_type.value})"`. When `--type MX`, `record_type.value` is `"MX"`, producing `"Discovered Subdomains for example.com (MX)"`.
+- [x] AC-4: The results table column formerly labelled "IP Address(es)" is now labelled "Records". — PASS: dnsmenace.py:1799 calls `table.add_column("Records", style="green")`. The old label `"IP Address(es)"` is gone from the diff.
+- [x] AC-5: JSON output includes `"type": "MX"` (or whichever type was queried) on each result object. — PASS: dnsmenace.py:1806-1809 builds each entry as `{"subdomain": fqdn, "addresses": ips, "type": record_type.value}`. The `"type"` key is present alongside `"subdomain"` and `"addresses"`.
+- [x] AC-6: CSV output includes a `"type"` column. — PASS: dnsmenace.py:1814 writes header `["subdomain", "addresses", "type"]`. dnsmenace.py:1816 writes each row as `[fqdn, "|".join(ips), record_type.value]`, adding the type value as the third column.
+
+### Code Quality (Refactor Review)
+
+No code quality issues found in changed files.
+
+### Security Assessment (Security Review)
+
+No security issues found in changed files.
+
+### Decisions Made During Implementation
+
+- Use singular RecordType parameter (not list) for brute --type option — multi-type enumeration is explicitly out of scope.
+- Rename table column to "Records" and include record type in table title — type-agnostic label that works for MX (priority+hostname), CNAME (domain), A (IP), and all other record types.
+- record_type captured as closure variable by check_one — no refactor of inline DNS logic needed, matching existing pattern.
+
+## Required Changes
+
+None.
+
