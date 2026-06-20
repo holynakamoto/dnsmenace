@@ -1,11 +1,11 @@
 {
   "id": "task-add-ttl-display-to-query-and-01kvkdasb8ts",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:00:05Z",
-  "updatedAt": "2026-06-20T21:15:02Z",
+  "updatedAt": "2026-06-20T21:20:37Z",
   "events": [
     {
       "base_branch": "master",
@@ -47,30 +47,146 @@
       "stage": "scope",
       "timestamp": "2026-06-20T21:15:02Z",
       "type": "stage_agent_started"
+    },
+    {
+      "change_summary": "Full scope: DNSResult.ttl field, query_dns capture, TTL column in display_results_table and propagation table",
+      "revision": 2,
+      "timestamp": "2026-06-20T21:17:39Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "CLI-only feature addition touching a single file — no UI design decisions (skip design), well-contained to one dataclass field and two table functions (skip architecture). The changes follow an established pattern already present in the zone-transfer display.",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "backend-feature",
+      "tier": "standard",
+      "timestamp": "2026-06-20T21:17:44Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Store TTL as a single `int | None` field on `DNSResult` rather than a parallel `list[int]`",
+      "rationale": "All records in a DNS RRset share one TTL value. A parallel list would add complexity with no benefit. A single nullable field keeps the dataclass simple and matches how dnspython exposes TTL (`answers.rrset.ttl` — one value per resolved rrset). The edge case of multiple rrsets in a single answer is not exercised by the two target functions.",
+      "timestamp": "2026-06-20T21:17:53Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Modify only `query_dns`, not `query_dns_simple` or `query_doh`",
+      "rationale": "`query_dns` is the function called by `run_dns_queries`, which feeds both `display_results_table` and the propagation command — the two tables named in scope. `query_dns_simple` and `query_doh` serve other code paths (reverse lookup, DoH command) that are explicitly out of scope.",
+      "timestamp": "2026-06-20T21:17:59Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope written as revision 2. Single phase, no architecture or design stages needed. Key decisions: TTL stored as `int | None` on DNSResult (one per RRset, not per answer); only `query_dns` modified (the one function feeding both target tables); JSON/CSV output explicitly preserved. The zone-transfer display at line 1303 is the established TTL pattern to follow.",
+      "timestamp": "2026-06-20T21:18:07Z",
+      "type": "stage_work_complete",
+      "worktree_head": "a6e2291104b382cae69cb77422ca3ddb4ce51c7c",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-20T21:20:36Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "bd7546a44109e1ad9d95cf26ab53eec6d2fe01d9",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "scope",
+      "stale_worktree_head": "a6e2291104b382cae69cb77422ca3ddb4ce51c7c",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "scope",
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-20T21:20:37Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvkegcck73aggmyhbp3mm22q",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvke65nkjn7cnw06nmcdxzmr",
+      "timed_out": false,
+      "timestamp": "2026-06-20T21:20:37Z",
+      "type": "agent_exited"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "backend-feature",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "CLI-only feature addition touching a single file — no UI design decisions (skip design), well-contained to one dataclass field and two table functions (skip architecture). The changes follow an established pattern already present in the zone-transfer display."
+  },
+  "stageApprovals": {
+    "scope": "2026-06-20T21:20:36Z"
+  },
   "stages": {
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T21:20:37Z"
+    },
+    "architecture": {
+      "status": "skipped"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T21:20:36Z",
+      "startedAt": "2026-06-20T21:15:02Z"
+    },
     "review": {
       "status": "not_started"
     },
-    "implementation": {
-      "status": "not_started"
-    },
-    "architecture": {
-      "status": "not_started"
+    "design": {
+      "status": "skipped"
     },
     "release": {
-      "status": "not_started"
-    },
-    "scope": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T21:15:02Z"
-    },
-    "design": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-ttl-display-to-query-and-01kvkdasb8ts",
   "worktreeBaseBranch": "master",
-  "worktreeLastSyncedAt": "2026-06-20T21:15:02Z"
+  "worktreeLastSyncedAt": "2026-06-20T21:20:37Z"
 }
