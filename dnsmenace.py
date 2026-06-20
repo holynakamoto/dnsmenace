@@ -603,6 +603,20 @@ def query(
             help="Output format",
         ),
     ] = OutputFormat.TABLE,
+    min_reliability: Annotated[
+        float | None,
+        typer.Option(
+            "--min-reliability",
+            help=(
+                "Minimum reliability score (0.0–1.0) a server must have to be queried. "
+                "Servers below this threshold are excluded before queries run. "
+                "Note: --limit caps how many servers are fetched first; raise --limit if "
+                "too few servers survive the reliability filter."
+            ),
+            min=0.0,
+            max=1.0,
+        ),
+    ] = None,
 ) -> None:
     """
     Query DNS servers from a specific country.
@@ -640,6 +654,16 @@ def query(
     if not nameservers:
         console.print("[red]No nameservers found for this country.[/red]")
         raise typer.Exit(1)
+
+    if min_reliability is not None:
+        checked_count = len(nameservers)
+        nameservers = [ns for ns in nameservers if ns.reliability >= min_reliability]
+        if not nameservers:
+            console.print(
+                f"[red]No nameservers met the reliability threshold of {min_reliability} "
+                f"({checked_count} server(s) checked).[/red]"
+            )
+            raise typer.Exit(1)
 
     if not machine_readable:
         console.print(f"[green]Found {len(nameservers)} nameservers[/green]\n")

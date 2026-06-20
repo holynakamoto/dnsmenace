@@ -1,11 +1,11 @@
 {
   "id": "task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z",
-  "status": "active",
+  "status": "completed",
   "stage": "release",
   "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T02:29:01Z",
-  "updatedAt": "2026-06-20T20:50:31Z",
+  "updatedAt": "2026-06-20T20:50:51Z",
   "events": [
     {
       "base_branch": "master",
@@ -546,6 +546,36 @@
       "rationale": "Production build passes (uv build --wheel: dist/dnsmenace-3.0.0-py3-none-any.whl), review approved on 2026-06-20T20:49:01Z (5/5 ACs, 4/4 checks), code committed and pushed to remote",
       "timestamp": "2026-06-20T20:50:31Z",
       "type": "decision"
+    },
+    {
+      "stage": "release",
+      "summary": "Release complete. Production build passes (uv build --wheel), branch pushed to remote (64be1ab..cdc8b43). Review was approved 2026-06-20T20:49:01Z with 5/5 ACs and 4/4 checks. Task adds --min-reliability filter to the query command, wiring in the already-fetched reliability score to drop low-quality servers before queries run.",
+      "timestamp": "2026-06-20T20:50:46Z",
+      "type": "stage_work_complete",
+      "worktree_head": "cdc8b43de1cdf8b48f6271ab4fd5100aa53cfe6c",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "files_changed": 1,
+      "lines_added": 24,
+      "lines_removed": 0,
+      "timestamp": "2026-06-20T20:50:49Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T20:50:49Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z",
+      "timestamp": "2026-06-20T20:50:51Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T20:50:51Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -563,16 +593,20 @@
     "rationale": "New CLI option added to a single Python module with no UI changes — skip design. The change is well-contained to one file and follows an established pattern (Typer Annotated options, existing empty-list guard) — skip architecture. Standard review and release gates remain."
   },
   "stageApprovals": {
+    "implementation": "2026-06-20T20:45:08Z",
     "review": "2026-06-20T20:49:01Z",
-    "scope": "2026-06-20T02:33:32Z",
-    "implementation": "2026-06-20T20:45:08Z"
+    "scope": "2026-06-20T02:33:32Z"
   },
+  "completedAt": "2026-06-20T20:50:51Z",
   "stageContent": {
     "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 1 files changed across 1 phases\n\nAll five acceptance criteria pass. The filtering block at dnsmenace.py:658-666 is correct: inclusive >= comparison, pre-fetch count captured, and empty-pool exit fires with the right message and exit code. AC-3 now correctly documents both Typer behaviors; AC-4/AC-5 zero new errors verified in the changed range.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Python syntax | PASS | dnsmenace.py compiles cleanly with py_compile — no syntax errors |\n| CLI help output | PASS | --min-reliability appears with FLOAT RANGE [0.0<=x<=1.0]; help text mentions the 0-1 range, exclusion effect, and --limit interaction |\n| Ruff lint (changed range) | PASS | 39 errors total — all pre-existing (master baseline has same 39 errors at lines shifted by ~14 before the insertion); zero new errors in changed range dnsmenace.py:606-666 |\n| Mypy strict (changed range) | PASS | 29 errors total — all at lines 1876-2187, entirely outside the changed range 606-666; zero new errors introduced |\n\n### Acceptance Criteria (5/5 passed)\n\n- [x] AC-1: `dnsmenace query -c US -d example.com` (no flag) produces identical output to today — confirmed by manual run and diff against baseline. — PASS: dnsmenace.py:658 — filtering block guarded by `if min_reliability is not None`; when the flag is omitted the block is skipped entirely, leaving the code path from fetch_nameservers through run_dns_queries unchanged\n- [x] AC-2: `dnsmenace query -c US -d example.com --min-reliability 0.9` only queries nameservers whose `reliability` field is 0.9 or higher; verified by inserting a `console.print` of the filtered list during a local run (removed before commit) or checking that reported server IPs correspond to high-reliability entries in the public-dns.info JSON response. — PASS: dnsmenace.py:660 — `nameservers = [ns for ns in nameservers if ns.reliability >= min_reliability]`; inclusive >= comparison correct per scope decision; NameServer.reliability is already float (dnsmenace.py:82), type-safe with no casting\n- [x] AC-3: AC-3 covers two distinct behaviors: (a) `dnsmenace query -c US -d example.com --min-reliability 1.1` (out-of-range) — Typer's range validator rejects the value before the command body runs, exits with code 2, message `Invalid value for '--min-reliability': 1.1 is not in the range 0.0<=x<=1.0`, no server count shown; (b) a within-range threshold that empties the pool (e.g. `--min-reliability 0.9` where all fetched servers score below 0.9) — the R4 message fires, exits with code 1, message names the threshold and server count: `No nameservers met the reliability threshold of 0.9 (N server(s) checked)`. Verified via Typer test runner with mock low-reliability servers: exit code 1 and correct message confirmed at dnsmenace.py:661-666. — PASS: Typer test runner: (a) --min-reliability 1.1 → exit code 2, 'Invalid value for --min-reliability: 1.1 is not in the range 0.0<=x<=1.0'; (b) --min-reliability 0.9 with mock servers at reliability 0.5 and 0.3 → exit code 1, 'No nameservers met the reliability threshold of 0.9 (2 server(s) checked)'\n- [x] AC-4: `ruff check dnsmenace.py` reports zero new errors in the changed range (lines 606–666). Note: 39 pre-existing errors exist in the codebase outside this range; a follow-up task covers the cleanup. — PASS: ruff: 39 errors, all pre-existing — master baseline has same 39; branch errors at lines 636 and 640 correspond to master lines 622 and 626 (shifted ~14 lines from the parameter insertion). Newly added lines 606-619 and 658-666 introduce zero ruff errors.\n- [x] AC-5: `mypy dnsmenace.py` reports zero new errors in the changed range (lines 606–666). Note: 29 pre-existing errors exist at lines 1876–2187, outside this range; a follow-up task covers the cleanup. — PASS: mypy: 29 errors, all at lines 1147-2187 — entirely outside changed range 606-666; no mypy output for lines 606-666 in grep check. Zero new errors introduced.\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Filter applied post-fetch, not inside fetch_nameservers — preserves shared function signature and keeps --limit semantics unchanged across all callers\n- Threshold comparison is inclusive (>=) — --min-reliability 0.8 means 'at least 0.8'; exclusive would silently drop servers scored exactly at the stated threshold\n- Typer min=0.0, max=1.0 range validation rejects out-of-range values (like 1.1) at the CLI layer with exit 2, while within-range thresholds that empty the pool hit the custom R4 message with exit 1\n- AC-3 updated mid-flight to document both distinct behaviors after loop-back verification confirmed the R4 path requires a within-range threshold, not an out-of-range value\n\n## Required Changes\n\nNone.\n",
     "implementation": "## Phase 1: Wire reliability filtering into the query command\n\n**Files changed:** `dnsmenace.py`\n\n**What was built:**\n\n1. Added `min_reliability: Annotated[float | None, typer.Option(\"--min-reliability\", min=0.0, max=1.0, ...)] = None` parameter to the `query` command. Typer enforces the 0.0–1.0 range automatically and returns a clean error for out-of-range values.\n\n2. Added filtering block between the `fetch_nameservers` call and the \"Found N nameservers\" display line. When `min_reliability` is set, nameservers with `reliability < min_reliability` are dropped. If the filtered pool is empty, a message naming the threshold and the count of servers checked is printed and the command exits with code 1.\n\n**Deviations from plan:** None. The help text notes the `--limit`-first interaction as specified. The threshold comparison is inclusive (`>=`) per the scope decision.\n\n**Pre-existing lint/type issues:** ruff reports 39 and mypy reports 29 pre-existing errors. Zero new errors were introduced by this change (all errors fall outside lines 603–670).",
     "release": "## Release Notes\n\n### What was built\n- Added `--min-reliability` option (float, range 0.0–1.0) to the `query` command, wiring in the reliability score already returned by `fetch_nameservers` but previously unused\n- Filtering runs post-fetch, before `run_dns_queries` is called — low-reliability servers are dropped from the pool without affecting the fetch logic or `--limit` semantics\n- Threshold comparison is inclusive (`>=`), so `--min-reliability 0.8` keeps servers scoring exactly 0.8\n- When the filtered pool is empty, a clear message naming the threshold and the count of servers checked is printed and the command exits with code 1\n- Typer range validation (`min=0.0, max=1.0`) rejects out-of-range values at the CLI layer with exit code 2 before the command body runs\n\n### Key decisions\n- Filter applied post-fetch, not inside `fetch_nameservers` — preserves the shared function signature and keeps `--limit` semantics unchanged across all callers\n- Threshold comparison is inclusive (`>=`) — `--min-reliability 0.8` means \"at least 0.8\"; exclusive would silently drop servers scored exactly at the stated threshold\n- Typer `min=0.0, max=1.0` range validation rejects out-of-range values (like 1.1) at the CLI layer with exit 2, while within-range thresholds that empty the pool hit the custom R4 message with exit 1\n- AC-3 updated mid-flight to document both distinct behaviors after loop-back verification confirmed the R4 path requires a within-range threshold, not an out-of-range value\n\n### Changes by phase\n- **Phase 1: Wire reliability filtering into the query command** — Added `--min-reliability` parameter to `query` function with Typer-enforced range validation; inserted filtering block between `fetch_nameservers` call and `run_dns_queries` invocation; added informative exit path when filtered pool is empty (dnsmenace.py:606–666)\n\n## Verification\n\n### Production Build\n- `uv build --wheel` — PASS: `dist/dnsmenace-3.0.0-py3-none-any.whl` built successfully\n\n### Code Push\n- Branch `feature/task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z` pushed to remote (64be1ab..cdc8b43)\n\n### Review Reference\n- Approved 2026-06-20T20:49:01Z — 5/5 acceptance criteria passed, 4/4 automated checks passed\n\n### Release Checklist\n- [x] Approved review exists\n- [x] Production build passes\n- [x] Code committed and pushed\n- [x] Release notes prepared\n- [x] Stage content updated\n- [x] Completion event logged\n"
   },
   "stages": {
+    "architecture": {
+      "status": "skipped"
+    },
     "implementation": {
       "status": "approved",
       "approvedAt": "2026-06-20T20:45:08Z",
@@ -581,26 +615,21 @@
     "design": {
       "status": "skipped"
     },
-    "architecture": {
-      "status": "skipped"
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T02:33:32Z",
+      "startedAt": "2026-06-20T02:29:48Z"
     },
     "review": {
       "status": "approved",
       "approvedAt": "2026-06-20T20:49:01Z",
       "startedAt": "2026-06-20T20:45:09Z"
     },
-    "scope": {
-      "status": "approved",
-      "approvedAt": "2026-06-20T02:33:32Z",
-      "startedAt": "2026-06-20T02:29:48Z"
-    },
     "release": {
-      "status": "in_progress",
+      "status": "awaiting_approval",
       "startedAt": "2026-06-20T20:49:01Z"
     }
   },
-  "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z",
-  "worktreeBaseBranch": "master",
   "worktreeLastSyncedAt": "2026-06-20T20:49:01Z",
   "loopBackHistory": [
     {
