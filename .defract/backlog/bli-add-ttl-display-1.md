@@ -8,6 +8,7 @@ labels: []
 groomingStatus: completed
 createdAt: 2026-06-19T19:08:39Z
 groomedAt: 2026-06-19T19:08:39Z
+promotedTaskId: task-add-ttl-display-to-query-and-01kvkdasb8ts
 ---
 
 Extend the DNS query functions to capture and surface TTL values alongside each answer, adding a TTL column to the table output in `display_results_table` and the propagation command.
