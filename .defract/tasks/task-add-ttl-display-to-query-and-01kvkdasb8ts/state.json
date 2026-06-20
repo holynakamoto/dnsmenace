@@ -5,7 +5,7 @@
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:00:05Z",
-  "updatedAt": "2026-06-20T21:01:10Z",
+  "updatedAt": "2026-06-20T21:15:02Z",
   "events": [
     {
       "base_branch": "master",
@@ -34,29 +34,43 @@
       "type": "stage_work_complete",
       "worktree_head": "967bd4f580f96159e024d4a120afdcb521f2c9e7",
       "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 2,
+      "timestamp": "2026-06-20T21:15:02Z",
+      "type": "worktree_synced"
+    },
+    {
+      "mode": "approve_initial",
+      "session_id": "01kvke65nkjn7cnw06nmcdxzmr",
+      "stage": "scope",
+      "timestamp": "2026-06-20T21:15:02Z",
+      "type": "stage_agent_started"
     }
   ],
   "stages": {
-    "architecture": {
-      "status": "not_started"
-    },
     "review": {
       "status": "not_started"
     },
     "implementation": {
       "status": "not_started"
     },
+    "architecture": {
+      "status": "not_started"
+    },
     "release": {
       "status": "not_started"
     },
     "scope": {
-      "status": "awaiting_approval",
-      "startedAt": "2026-06-20T21:00:05Z"
+      "status": "in_progress",
+      "startedAt": "2026-06-20T21:15:02Z"
     },
     "design": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-ttl-display-to-query-and-01kvkdasb8ts",
-  "worktreeBaseBranch": "master"
+  "worktreeBaseBranch": "master",
+  "worktreeLastSyncedAt": "2026-06-20T21:15:02Z"
 }
