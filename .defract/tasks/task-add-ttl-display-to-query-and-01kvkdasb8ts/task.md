@@ -15,7 +15,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 Promoted from backlog item `bli-add-ttl-display-1`.
@@ -131,3 +130,23 @@ Before implementing R6: check whether `display_results_json` calls `dataclasses.
 ### Dependencies
 
 None. All changes are confined to `dnsmenace.py` and the existing dnspython `Answer` object interface.
+
+## Implementation Notes
+
+## Phase 1: Add TTL column to query and propagation tables
+
+**Files modified:** `dnsmenace.py`
+
+**Changes:**
+
+1. `DNSResult` dataclass (line 91) — added `ttl: int | None = None` as a trailing field using the existing `= None` pattern; no `field()` wrapper needed since it is a scalar default.
+
+2. `query_dns` success path — after populating `result.answers`, captures `answers.rrset.ttl` into `result.ttl`, guarded with `if answers.rrset is not None`. Error paths leave `ttl` as `None`.
+
+3. `display_results_table` — added a right-justified "TTL (s)" column (style: magenta) between Response and Time (ms). Each row shows `str(result.ttl)` when set, `"-"` when `None`. Zero-TTL records display as `"0"` correctly.
+
+4. Propagation inline table — same column added in the same position with the same logic.
+
+5. `display_results_json` and `display_results_csv` — not modified; both manually construct output dicts/rows, so the new `ttl` field is never exposed.
+
+**Test results:** 32/32 passed (test_scenarios.py). Zero new ruff warnings, zero new mypy errors.

@@ -5,7 +5,7 @@
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:00:05Z",
-  "updatedAt": "2026-06-20T21:20:37Z",
+  "updatedAt": "2026-06-20T21:24:29Z",
   "events": [
     {
       "base_branch": "master",
@@ -144,6 +144,112 @@
       "timed_out": false,
       "timestamp": "2026-06-20T21:20:37Z",
       "type": "agent_exited"
+    },
+    {
+      "note": "implementing phase 1: add TTL field to DNSResult, capture in query_dns, add TTL column to both tables",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T21:21:03Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Add TTL column to query and propagation tables",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-20T21:21:06Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-20T21:21:36Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-20T21:22:02Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "No automated test suite exists (pytest dev dep listed but no test files). Static analysis: ruff — 39 pre-existing warnings, 0 new. mypy — 29 pre-existing errors, 0 new.",
+      "failed": 0,
+      "passed": 0,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T21:22:04Z",
+      "type": "test_results"
+    },
+    {
+      "details": "32/32 tests passed in test_scenarios.py. ruff: 39 pre-existing warnings, 0 new. mypy: 29 pre-existing errors, 0 new.",
+      "failed": 0,
+      "passed": 32,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T21:24:02Z",
+      "type": "test_results"
+    },
+    {
+      "artifacts_created": [
+        "dnsmenace.py"
+      ],
+      "phase": 0,
+      "summary": "Added ttl: int | None = None field to DNSResult dataclass. Captured TTL from answers.rrset.ttl in query_dns success path, guarded against None rrset. Added right-justified \"TTL (s)\" column between Response and Time (ms) in display_results_table and the propagation command's inline table. JSON and CSV outputs unchanged (both manually build their output without dataclasses.asdict). 32/32 tests pass, zero new ruff or mypy errors.",
+      "timestamp": "2026-06-20T21:24:06Z",
+      "type": "phase_completed"
+    },
+    {
+      "change_summary": "Phase 1 complete: Add TTL column to query and propagation tables",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T21:24:17Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `dnsmenace query example.com` and confirm the results table has a \"TTL (s)\" column between Response and Time (ms) showing a positive integer for each row."
+        },
+        {
+          "description": "Run `dnsmenace propagation example.com` and confirm the propagation table has a \"TTL (s)\" column between Response and Time (ms) showing positive integers for resolvers that returned results."
+        },
+        {
+          "description": "Run `dnsmenace query nonexistent.invalid` and confirm the TTL column shows \"-\" for every row with no Python traceback."
+        },
+        {
+          "description": "Run `dnsmenace query example.com --output json` and confirm the output contains no `ttl` key (format identical to before this change)."
+        },
+        {
+          "description": "Run `dnsmenace query example.com --output csv` and confirm the output contains no `ttl` column header or values."
+        },
+        {
+          "description": "Run `python3 -m mypy dnsmenace.py` and confirm no new errors appear beyond the 29 pre-existing ones."
+        },
+        {
+          "description": "Run `python3 -m ruff check dnsmenace.py` and confirm no new warnings appear beyond the 39 pre-existing ones."
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Add TTL column to query and propagation tables",
+      "timestamp": "2026-06-20T21:24:24Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Add TTL column to query and propagation tables",
+      "server_phase": 0,
+      "timestamp": "2026-06-20T21:24:29Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Add TTL column to query and propagation tables",
+      "timestamp": "2026-06-20T21:24:29Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "bd7546a44109e1ad9d95cf26ab53eec6d2fe01d9",
+      "worktree_status_digest": "7a70df149c6e4132812b89e3a5fb00f64fee99f468d82ad36f890c9aa6c4d7ba"
     }
   ],
   "needsArchitecture": false,
@@ -163,27 +269,30 @@
   "stageApprovals": {
     "scope": "2026-06-20T21:20:36Z"
   },
+  "stageContent": {
+    "implementation": "## Phase 1: Add TTL column to query and propagation tables\n\n**Files modified:** `dnsmenace.py`\n\n**Changes:**\n\n1. `DNSResult` dataclass (line 91) — added `ttl: int | None = None` as a trailing field using the existing `= None` pattern; no `field()` wrapper needed since it is a scalar default.\n\n2. `query_dns` success path — after populating `result.answers`, captures `answers.rrset.ttl` into `result.ttl`, guarded with `if answers.rrset is not None`. Error paths leave `ttl` as `None`.\n\n3. `display_results_table` — added a right-justified \"TTL (s)\" column (style: magenta) between Response and Time (ms). Each row shows `str(result.ttl)` when set, `\"-\"` when `None`. Zero-TTL records display as `\"0\"` correctly.\n\n4. Propagation inline table — same column added in the same position with the same logic.\n\n5. `display_results_json` and `display_results_csv` — not modified; both manually construct output dicts/rows, so the new `ttl` field is never exposed.\n\n**Test results:** 32/32 passed (test_scenarios.py). Zero new ruff warnings, zero new mypy errors."
+  },
   "stages": {
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T21:20:37Z"
+    "release": {
+      "status": "not_started"
     },
-    "architecture": {
-      "status": "skipped"
+    "review": {
+      "status": "not_started"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T21:20:36Z",
       "startedAt": "2026-06-20T21:15:02Z"
     },
-    "review": {
-      "status": "not_started"
+    "architecture": {
+      "status": "skipped"
+    },
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T21:20:37Z"
     },
     "design": {
       "status": "skipped"
-    },
-    "release": {
-      "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-ttl-display-to-query-and-01kvkdasb8ts",
