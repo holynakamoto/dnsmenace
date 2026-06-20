@@ -4,8 +4,7 @@ rawText: ''
 title: Add record type support to the brute subdomain command
 type: improvement
 module: dnsmenace.py
-labels:
-- starter
+labels: []
 groomingStatus: completed
 createdAt: 2026-06-19T19:08:39Z
 groomedAt: 2026-06-19T19:08:39Z

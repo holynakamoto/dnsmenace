@@ -9,6 +9,7 @@ labels:
 groomingStatus: completed
 createdAt: 2026-06-19T19:08:39Z
 groomedAt: 2026-06-19T19:08:39Z
+promotedTaskId: task-add-min-reliability-filter-to-the-query-01kvhdrbsx1z
 ---
 
 Wire the `reliability` field already returned by `fetch_nameservers` into the `query` command by adding a `--min-reliability` option (e.g. `--min-reliability 0.8`) that filters out low-quality servers before queries run.
