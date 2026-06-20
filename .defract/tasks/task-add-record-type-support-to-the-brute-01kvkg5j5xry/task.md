@@ -3,7 +3,7 @@ defract:
   id: task-add-record-type-support-to-the-brute-01kvkg5j5xry
   type: improvement
   status: active
-  stage: scope
+  stage: implementation
   phase: 0
   total_phases: 1
   priority: normal
@@ -28,6 +28,8 @@ Original paste from the builder:
 
 # Add record type support to the brute subdomain command
 
+# Add record type support to the brute subdomain command
+
 ## What We're Building
 
 The `brute` subdomain enumeration command currently queries only A records, which misses mail servers, CDN aliases, and other subdomain patterns that only resolve under different record types. We are adding a `--type` option so users can enumerate subdomains using any DNS record type — for example MX or CNAME — and see the queried type reflected in the results table.
@@ -39,8 +41,106 @@ The `brute` subdomain enumeration command currently queries only A records, whic
 - When no type is specified, the command defaults to A records, preserving existing behavior
 - The option mirrors the `--type` convention already used on other commands in the tool
 
+## Phase Outcomes
+
+- **Phase 1: Add `--type` option to brute enumeration** — Users can specify any DNS record type when bruteforcing subdomains. The results table reflects the queried type, and all output formats (table, JSON, CSV) include the record type in their output.
+
 ## Out of Scope
 
 - Querying multiple record types in a single `brute` invocation (parallel multi-type enumeration is a separate enhancement)
 - Adding `--type` support to commands other than `brute`
 - Changes to the subdomain wordlist or any other enumeration logic beyond the record type lookup
+
+## Scope Summary
+
+**Size:** 6 requirements, 6 acceptance criteria, 1 implementation phase
+**Key decisions:**
+- Single `RecordType` parameter (not list) — multi-type is explicitly out of scope
+- Column header "IP Address(es)" renamed to "Records" to be type-agnostic
+- `record_type` captured as a closure variable by `check_one` — no refactor of the inline DNS logic needed
+**Biggest risk:** MX and CNAME answers are formatted differently from A records (e.g., MX includes priority); the existing `str(rdata)` serialisation via dnspython should handle this but needs verification.
+
+## Context
+
+The `brute` command (`dnsmenace.py:1634–1810`) performs subdomain enumeration using a batch async loop. Its inner `check_one` closure hardcodes `"A"` in two places: the DoH path (`query_doh(provider, fqdn, RecordType.A)` at line ~1747) and the standard resolver path (`resolver.resolve(fqdn, "A")` at line ~1756). All other major commands — `query` (line 589), `compare` (line 709), `propagation` (line 1338), and `doh` (line 1533) — already expose `--type` / `-t` via `Annotated[RecordType, typer.Option(...)]` with a default of `RecordType.A`. The `RecordType` enum is already defined and covers all standard DNS record types. The results table currently has two columns: Subdomain and IP Address(es); JSON and CSV outputs use `addresses` as the key name.
+
+## Requirements
+
+### CLI Parameter
+
+- R1: The `brute` command accepts a `--type` / `-t` option that takes a `RecordType` value, defaulting to `RecordType.A`. The declaration follows the `Annotated[RecordType, typer.Option("--type", "-t", help="DNS record type to query")]` pattern used by `compare` and `propagation`.
+
+### DNS Query Logic
+
+- R2: The `check_one` closure captures `record_type` from the outer `brute` scope and uses it instead of the hardcoded `RecordType.A` (DoH path) and `"A"` (resolver path) literals.
+- R3: Both query paths — DoH (`query_doh`) and standard resolver (`resolver.resolve`) — use the parameterised record type.
+
+### Display
+
+- R4: The results table column header "IP Address(es)" is renamed to "Records" to be type-agnostic.
+- R5: The results table title includes the queried record type (e.g., `Discovered Subdomains for example.com (MX)`).
+
+### Output Formats
+
+- R6: JSON output includes a `"type"` field alongside `"subdomain"` and `"addresses"` containing the record type string (e.g., `"MX"`). CSV output includes a `"type"` column.
+
+## Acceptance Criteria
+
+- [ ] Running `dnsmenace brute example.com --type MX` (or `-t MX`) executes without error and queries MX records for each subdomain candidate.
+- [ ] Running `dnsmenace brute example.com` with no `--type` queries A records, preserving existing behavior.
+- [ ] The results table title contains the record type string (e.g., "MX") when `--type MX` is used.
+- [ ] The results table column formerly labelled "IP Address(es)" is now labelled "Records".
+- [ ] JSON output includes `"type": "MX"` (or whichever type was queried) on each result object.
+- [ ] CSV output includes a `"type"` column.
+
+## Implementation Phases
+
+### Phase 1: Add --type option to the brute command
+**Scope:** Add the `record_type` parameter to the `brute` function signature, thread it through the `check_one` closure, and update all output paths (table, JSON, CSV) to reflect the queried type.
+**Files:**
+- `dnsmenace.py` — modify the `brute` function (lines 1634–1810): add parameter, update `check_one` closure, rename table column, update table title, update JSON and CSV output schemas
+**Verification:**
+- `dnsmenace brute <real-domain> --type MX` runs without error and queries MX records
+- `dnsmenace brute <real-domain>` still defaults to A records
+- Table title includes the record type string
+- Table column header reads "Records" not "IP Address(es)"
+- `dnsmenace brute <real-domain> --output json` output includes `"type"` field on each result
+- `dnsmenace brute <real-domain> --output csv` output includes `"type"` column
+- `ruff check dnsmenace.py` passes
+- `mypy dnsmenace.py` passes
+**Estimated effort:** Small
+
+## Edge Cases
+
+- MX records include a priority integer in their `str()` representation (e.g., `"10 mail.example.com"`): dnspython's `str(rdata)` handles this — no special-casing needed.
+- CNAME records return a target domain name, not an IP address: the column rename to "Records" already accommodates this.
+- No subdomains resolve for the queried type: the existing "No subdomains discovered" message handles this — no change needed.
+- An invalid record type string is passed via `--type`: Typer and the `RecordType` enum reject it before the command runs, consistent with other commands.
+
+## Technical Notes
+
+`check_one` is a closure defined inside `run_brute`, which is itself defined inside `brute`. The new `record_type` parameter on `brute` is accessible to `check_one` via closure without any change to `check_one`'s own signature. Use `record_type` (the enum value) when calling `query_doh`, and `record_type.value` (the string) when calling `resolver.resolve` — matching the pattern in `query_dns_simple` (`dnsmenace.py:243`).
+
+The `query_dns_simple` helper at line 243 already accepts `record_type: str`. The `brute` command does not use it (it inlines the resolver logic); no refactor of that approach is needed — just parameterise the existing inline code.
+
+## Implementation Notes
+
+## Phase 1: Add --type option to the brute command
+
+**Files changed:** `dnsmenace.py`
+
+**Changes made:**
+
+1. Added `record_type: Annotated[RecordType, typer.Option("--type", "-t", help="DNS record type to query")] = RecordType.A` parameter to the `brute` function (between the `country` and `output` parameters), matching the pattern used by `compare` and `propagation` commands.
+
+2. Updated `check_one` closure to use `record_type` (enum value) for the DoH path (`query_doh`) and `record_type.value` (string) for the resolver path (`resolver.resolve`), replacing the two hardcoded literals `RecordType.A` and `"A"`.
+
+3. Renamed table column from `"IP Address(es)"` to `"Records"` — type-agnostic label that works for MX, CNAME, A, and all other record types.
+
+4. Updated table title to `f"Discovered Subdomains for {domain} ({record_type.value})"` — shows queried type in parentheses.
+
+5. Updated JSON output: `{"subdomain": fqdn, "addresses": ips, "type": record_type.value}` — adds `"type"` field alongside existing fields.
+
+6. Updated CSV header row to `["subdomain", "addresses", "type"]` and each data row to include `record_type.value` as the third column.
+
+**No deviations from plan.** All 32 pre-existing tests pass; no new ruff or mypy issues introduced.

@@ -1,11 +1,11 @@
 {
   "id": "task-add-record-type-support-to-the-brute-01kvkg5j5xry",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T21:49:40Z",
-  "updatedAt": "2026-06-20T21:50:16Z",
+  "updatedAt": "2026-06-20T22:04:57Z",
   "events": [
     {
       "base_branch": "master",
@@ -34,29 +34,266 @@
       "type": "stage_work_complete",
       "worktree_head": "9c163d60ff84175aa30dfc59d840a1c3e9628ac8",
       "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T21:54:49Z",
+      "type": "worktree_synced"
+    },
+    {
+      "mode": "approve_initial",
+      "session_id": "01kvkgf0g1yb2pksmx35awmza9",
+      "stage": "scope",
+      "timestamp": "2026-06-20T21:54:49Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "change_summary": "Full scope with requirements, acceptance criteria, and detailed single-phase implementation",
+      "revision": 2,
+      "timestamp": "2026-06-20T21:57:15Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Adding a CLI parameter and threading it through one function in one file — no web UI changes (skip design), touches a single well-understood subsystem with no new boundaries (skip architecture). Standard backend-feature pipeline is the right fit.",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "backend-feature",
+      "tier": "standard",
+      "timestamp": "2026-06-20T21:57:23Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Use singular RecordType parameter (not list[RecordType]) for brute --type option",
+      "rationale": "Multi-type enumeration in a single run is explicitly out of scope per the builder's brief. Using a list would imply parallel multi-type support; a single value keeps the interface consistent with compare and propagation commands and avoids pre-building infrastructure for an out-of-scope enhancement.",
+      "timestamp": "2026-06-20T21:57:28Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Rename table column \"IP Address(es)\" to \"Records\" and include record type in table title",
+      "rationale": "MX answers include priority and a hostname; CNAME answers are domain names — neither is an IP address. \"Records\" is type-agnostic and correct for all RecordType values. Including the queried type in the table title (e.g., \"Discovered Subdomains for example.com (MX)\") satisfies the builder's requirement to show the queried type without adding a redundant per-row column.",
+      "timestamp": "2026-06-20T21:57:33Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope complete as revision 2. Single implementation phase targeting dnsmenace.py:1634–1810 — adds `--type`/`-t` RecordType parameter to `brute`, threads it through the `check_one` closure (two hardcoded \"A\" literals removed), renames the table column to \"Records\", puts the record type in the table title, and adds a `\"type\"` field to JSON/CSV output. Workflow: backend-feature, standard tier, no design or architecture stages needed.",
+      "timestamp": "2026-06-20T21:57:40Z",
+      "type": "stage_work_complete",
+      "worktree_head": "811c4c6a77ec651c39f6f2b138a292436679533a",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "master",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:00:47Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "8d48d07f8e85f58c1b4a7c1ff431e63c8b85c363",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "scope",
+      "stale_worktree_head": "811c4c6a77ec651c39f6f2b138a292436679533a",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-20T22:00:48Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "master",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvkgsz4stsrr2zkxd5dwvjyx",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkgf0g1yb2pksmx35awmza9",
+      "timed_out": false,
+      "timestamp": "2026-06-20T22:00:48Z",
+      "type": "agent_exited"
+    },
+    {
+      "note": "Starting Phase 1: adding --type option to brute command",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:01:09Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Add --type option to the brute command",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:01:13Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:01:43Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:02:35Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "32 tests passed. All pre-existing ruff/mypy issues unchanged; no new issues introduced by this phase's changes.",
+      "failed": 0,
+      "passed": 32,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T22:04:28Z",
+      "type": "test_results"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:04:30Z",
+      "type": "progress_report"
+    },
+    {
+      "change_summary": "Phase 1 complete: Add --type option to brute command",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:04:41Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "artifacts_created": [
+        "dnsmenace.py"
+      ],
+      "phase": 0,
+      "summary": "Added --type/-t RecordType option to brute command; threaded through check_one closure (both DoH and resolver paths); renamed table column to \"Records\"; added record type to table title; added \"type\" field to JSON output; added \"type\" column to CSV output. 32/32 tests pass, no new lint issues.",
+      "timestamp": "2026-06-20T22:04:45Z",
+      "type": "phase_completed"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `dnsmenace brute google.com --type MX` and confirm it completes without error and shows MX records in the results."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com` (no --type flag) and confirm it defaults to querying A records."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com --type MX` and verify the table title contains `(MX)` in parentheses."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com --type CNAME` and verify the results table column header reads `Records` (not `IP Address(es)`)."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com --type MX --output json` and verify each result object contains a `\"type\": \"MX\"` field alongside `\"subdomain\"` and `\"addresses\"`."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com --type A --output csv` and verify the CSV header row is `subdomain,addresses,type` and each data row includes `A` in the third column."
+        },
+        {
+          "description": "Run `dnsmenace brute google.com -t TXT` and confirm the short flag `-t` is accepted and the table title shows `(TXT)`."
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Add --type option to the brute command",
+      "timestamp": "2026-06-20T22:04:53Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Add --type option to the brute command",
+      "server_phase": 0,
+      "timestamp": "2026-06-20T22:04:57Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Add --type option to the brute command",
+      "timestamp": "2026-06-20T22:04:57Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "8d48d07f8e85f58c1b4a7c1ff431e63c8b85c363",
+      "worktree_status_digest": "7a70df149c6e4132812b89e3a5fb00f64fee99f468d82ad36f890c9aa6c4d7ba"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "backend-feature",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Adding a CLI parameter and threading it through one function in one file — no web UI changes (skip design), touches a single well-understood subsystem with no new boundaries (skip architecture). Standard backend-feature pipeline is the right fit."
+  },
+  "stageApprovals": {
+    "scope": "2026-06-20T22:00:47Z"
+  },
+  "stageContent": {
+    "implementation": "## Phase 1: Add --type option to the brute command\n\n**Files changed:** `dnsmenace.py`\n\n**Changes made:**\n\n1. Added `record_type: Annotated[RecordType, typer.Option(\"--type\", \"-t\", help=\"DNS record type to query\")] = RecordType.A` parameter to the `brute` function (between the `country` and `output` parameters), matching the pattern used by `compare` and `propagation` commands.\n\n2. Updated `check_one` closure to use `record_type` (enum value) for the DoH path (`query_doh`) and `record_type.value` (string) for the resolver path (`resolver.resolve`), replacing the two hardcoded literals `RecordType.A` and `\"A\"`.\n\n3. Renamed table column from `\"IP Address(es)\"` to `\"Records\"` — type-agnostic label that works for MX, CNAME, A, and all other record types.\n\n4. Updated table title to `f\"Discovered Subdomains for {domain} ({record_type.value})\"` — shows queried type in parentheses.\n\n5. Updated JSON output: `{\"subdomain\": fqdn, \"addresses\": ips, \"type\": record_type.value}` — adds `\"type\"` field alongside existing fields.\n\n6. Updated CSV header row to `[\"subdomain\", \"addresses\", \"type\"]` and each data row to include `record_type.value` as the third column.\n\n**No deviations from plan.** All 32 pre-existing tests pass; no new ruff or mypy issues introduced."
+  },
   "stages": {
-    "release": {
-      "status": "not_started"
-    },
-    "design": {
-      "status": "not_started"
-    },
-    "architecture": {
-      "status": "not_started"
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T22:00:48Z"
     },
     "review": {
       "status": "not_started"
     },
-    "scope": {
-      "status": "awaiting_approval",
-      "startedAt": "2026-06-20T21:49:40Z"
+    "design": {
+      "status": "skipped"
     },
-    "implementation": {
+    "architecture": {
+      "status": "skipped"
+    },
+    "release": {
       "status": "not_started"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:00:47Z",
+      "startedAt": "2026-06-20T21:54:49Z"
     }
   },
   "worktreePath": "/Users/nickmoore/dnsmenace/.defract-worktrees/task-add-record-type-support-to-the-brute-01kvkg5j5xry",
-  "worktreeBaseBranch": "master"
+  "worktreeBaseBranch": "master",
+  "worktreeLastSyncedAt": "2026-06-20T22:00:48Z"
 }
