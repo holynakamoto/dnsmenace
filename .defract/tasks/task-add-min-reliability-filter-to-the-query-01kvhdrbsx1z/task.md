@@ -15,7 +15,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 Promoted from backlog item `bli-add-min-reliability-2`.
@@ -115,3 +114,19 @@ Follow the existing `Annotated[..., typer.Option(...)]` parameter style used thr
 The filtering block should sit between the `fetch_nameservers` call (line 638) and the existing empty-list guard (line 640). Reuse the existing `console.print(...) / raise typer.Exit(1)` pattern for the zero-pool error path.
 
 The `reliability` field is already a `float` on `NameServer` (line 82), so the comparison `ns.reliability >= min_reliability` is type-safe with no casting needed.
+
+## Implementation Notes
+
+## Phase 1: Wire reliability filtering into the query command
+
+**Files changed:** `dnsmenace.py`
+
+**What was built:**
+
+1. Added `min_reliability: Annotated[float | None, typer.Option("--min-reliability", min=0.0, max=1.0, ...)] = None` parameter to the `query` command. Typer enforces the 0.0–1.0 range automatically and returns a clean error for out-of-range values.
+
+2. Added filtering block between the `fetch_nameservers` call and the "Found N nameservers" display line. When `min_reliability` is set, nameservers with `reliability < min_reliability` are dropped. If the filtered pool is empty, a message naming the threshold and the count of servers checked is printed and the command exits with code 1.
+
+**Deviations from plan:** None. The help text notes the `--limit`-first interaction as specified. The threshold comparison is inclusive (`>=`) per the scope decision.
+
+**Pre-existing lint/type issues:** ruff reports 39 and mypy reports 29 pre-existing errors. Zero new errors were introduced by this change (all errors fall outside lines 603–670).
